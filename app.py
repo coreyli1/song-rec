@@ -1,10 +1,27 @@
 from flask import Flask, render_template, redirect, request, session
+from flask_sqlalchemy import SQLAlchemy
 from urllib.parse import quote
 import requests
 import json
 
 app = Flask(__name__)
 app.secret_key = 'hello'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f"User( {username}, {email}"
+
+class Recommendations(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    recommendation = db.Column(db.String(80))
+
 
 # Spotify URLS
 SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
@@ -38,11 +55,8 @@ auth_query_parameters = {
 
 
 
-@app.route("/")
-def index():
-    return render_template("index.html")
 
-@app.route("/authenticate")
+@app.route("/")
 def auth():
     url_args = "&".join(["{}={}".format(key, quote(val)) for key, val in auth_query_parameters.items()])
     auth_url = "{}/?{}".format(SPOTIFY_AUTH_URL, url_args)
@@ -81,15 +95,28 @@ def callback():
     user_profile_api_endpoint = "{}/me".format(SPOTIFY_API_URL)
     profile_response = requests.get(user_profile_api_endpoint, headers=authorization_header)
     profile_data = json.loads(profile_response.text)
-    session['profile_data'] = profile_data
 
-    # Combine profile and playlist data to display
-    return redirect(f'/profile/{profile_data["uri"]}')
+    # storing personal user data
+    session['profile_data'] = profile_data
+    session['access_token'] = access_token
+
+    # redirecting to the home page
+    return redirect('/home')
+
+@app.route("/home")
+def home():
+    print(session['profile_data'])
+    print(session['access_token'])
+    return render_template("home.html")
 
 @app.route("/profile/<id>")
 def profile(id):
     profile_data = session['profile_data']
     return render_template("profile.html", pd=profile_data)
+
+@app.route("/rec/<id>")
+def rec(id):
+    return render_template("rec.html", rec=recommendation)
 
 if __name__ == "__main__":
     app.run(debug=True) 

@@ -6,9 +6,14 @@
     <title>Document</title>
 </head>
 <body>
-    <div>hello</div>
-    <div>{{pd.display_name}}</div>
-    <img src="{{pd.images[0].url}}"/>
+    <h1>{{pd.display_name}}</h1>
+
+    {% if pd.images|length > 0 %}
+        <img src="{{pd.images[0].url}}"/>
+    {% else %}
+        <img src="../static/profpic.jfif"/>
+    {% endif %}
+
     <div>{{pd}}</div>
 </body>
 </html>

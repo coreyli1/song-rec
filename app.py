@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, session
+from flask import Flask, render_template, redirect, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from urllib.parse import quote
 import requests
@@ -12,15 +12,23 @@ db = SQLAlchemy(app)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    name = db.Column(db.String(80), nullable=False)
+    uri = db.Column(db.String(120), unique=True, nullable=False)
+    access_token=db.Column(db.String(120), nullable=False)
+    tracks = db.relationship('Track', backref='user', lazy=True)
 
     def __repr__(self):
-        return f"User( {username}, {email}"
+        return f"User( {self.name}, {self.uri} )"
 
-class Recommendations(db.Model):
+class Track(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    recommendation = db.Column(db.String(80))
+    song_name = db.Column(db.String(40), nullable=False)
+    artist = db.Column(db.String(40), nullable=False)
+    album_cover = db.Column(db.String(40), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f"Track( {self.song_name}, {self.artist} )"
 
 
 # Spotify URLS
@@ -100,23 +108,52 @@ def callback():
     session['profile_data'] = profile_data
     session['access_token'] = access_token
 
+    name = profile_data['display_name']
+    uri = profile_data['uri']
+    a_t = access_token
+    user = User(name=name, uri=uri, access_token=a_t)
+
+    if User.query.filter_by(name = name).first() != None and User.query.filter_by(name = name).first().name == name:
+        print('User is already created')
+    else:
+        db.session.add(user)
+        db.session.commit()
+        print(f'{name} is added to the database')
+    
     # redirecting to the home page
     return redirect('/home')
 
 @app.route("/home")
 def home():
-    print(session['profile_data'])
-    print(session['access_token'])
-    return render_template("home.html")
+    profile_data = session['profile_data']
+    return render_template("home.html", pd=profile_data)
 
 @app.route("/profile/<id>")
 def profile(id):
+    print(id)
     profile_data = session['profile_data']
-    return render_template("profile.html", pd=profile_data)
+    if (id == profile_data['uri']):
+        return render_template("profile.html", pd=profile_data)
+    else:
+        return redirect(url_for('rec', id=id))
 
 @app.route("/rec/<id>")
 def rec(id):
-    return render_template("rec.html", rec=recommendation)
+    return render_template("rec.html")
+
+@app.route("/results", methods=["GET", "POST"])
+def results():
+
+    if request.method == "POST":
+        access_token = session['access_token']
+        auth_header = {"Authorization": "Bearer {}".format(access_token)}
+        track = request.form["recommendation"]
+        query = track.replace(" ", "%20") + "&type=track"
+        search_url = "https://api.spotify.com/v1/search?q=" + query
+        search_response = requests.get(search_url, headers=auth_header)
+        search_result = json.loads(search_response.text)
+
+    return render_template("results.html", sr=search_result)
 
 if __name__ == "__main__":
     app.run(debug=True) 

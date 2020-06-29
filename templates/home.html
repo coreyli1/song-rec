@@ -3,10 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
     <title>Document</title>
 </head>
 <body>
-    <a>Profile</a>
-    <a>Other</a>
+    <div class='ui padded centered grid'>
+        <div class='row'>
+            <img src="../static/profpic.jfif"/>
+        </div>
+        <div class='row'>   
+            <a class='ui button' href='{{url_for('profile', id=pd['uri'])}}'>Profile</a>
+        </div>
+        <div class='row'>
+            <a class='ui button' href='#'>Other</a>    
+        </div>
+                    
+
+
+    </div>
+
 </body>
 </html>

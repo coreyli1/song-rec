@@ -139,7 +139,8 @@ def profile(id):
 
 @app.route("/rec/<id>")
 def rec(id):
-    return render_template("rec.html")
+    name = User.query.filter_by(uri = id).first().name
+    return render_template("rec.html", name=name)
 
 @app.route("/results", methods=["GET", "POST"])
 def results():
@@ -152,8 +153,24 @@ def results():
         search_url = "https://api.spotify.com/v1/search?q=" + query
         search_response = requests.get(search_url, headers=auth_header)
         search_result = json.loads(search_response.text)
-
     return render_template("results.html", sr=search_result)
 
+@app.route("/add_song/<uri>")
+def add_song(uri):
+    
+    access_token = session['access_token']
+    auth_header = {"Authorization": "Bearer {}".format(access_token)}
+    track_url = "https://api.spotify.com/v1/tracks/" + uri[14:]
+    print(track_url)
+    search_response = requests.get(track_url, headers=auth_header)
+    search_result = json.loads(search_response.text)
+    title = search_result['name']
+    artist = search_result['artists'][0]['name']
+    img_url = search_result['album']['images'][1]['url']
+    print(title, artist, img_url)
+
+
+    # track = Track(song_name=title, )
+    return redirect(url_for('home'))
 if __name__ == "__main__":
     app.run(debug=True) 

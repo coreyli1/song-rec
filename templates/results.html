@@ -3,9 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
     <title>Document</title>
 </head>
 <body>
-    <div>{{sr}}</div>
+    <div class="ui cards grid centered ">
+        {%for item in sr['tracks']['items'] %}
+        <div class="card">
+            <div class="ui image">
+                <img src='{{ item['album']['images'][1]['url'] }}' />
+            </div>
+
+            <div class="content">
+                <div>{{item['name']}} </div>
+                <div>{{item['artists'][0]['name']}}</div>   
+                <a class="ui button primary" href="{{url_for('add_song', uri=item['uri'])}}"">add</a>
+         
+            </div>
+            
+
+        </div>
+
+        
+        {% endfor%}
+
+    </div>
 </body>
 </html>

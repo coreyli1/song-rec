@@ -7,15 +7,44 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>{{pd.display_name}}</h1>
+    <div class="ui padded grid centered">
 
-    {% if pd.images|length > 0 %}
-        <img src="{{pd.images[0].url}}"/>
-    {% else %}
-        <img src="../static/profpic.jfif"/>
-    {% endif %}
+        <h1 class="row" >Hi {{pd.display_name}}</h1>
+        <!-- <div class="row">
 
-    <div>{{pd}}</div>
-    <h2>Here are your recommendations</h2>
+            <div class="ui image large">
+                {% if pd.images|length > 0 %}
+                    <img src="{{pd.images[0].url}}"/>
+                {% else %}
+                    <img src="../static/profpic.jfif"/>
+                {% endif %}
+            </div>
+
+
+        </div> -->
+
+
+
+        <h2 class="row">Here are your recommendations</h2>
+        <div class="ui cards">
+            {%for track in tr %}
+            <div class="card">
+                <div class="ui image">
+                    <img src="{{track.album_cover}}" />                
+                </div>
+                <div class="content">
+                    <p>{{track.song_name}}</p>
+                    <p>{{track.artist}}</p>
+                    <a class="ui button primary">add</a>
+                </div>
+            </div>
+                
+
+            {%endfor%}        
+        </div>
+
+    </div>
+
+
 </body>
 </html>

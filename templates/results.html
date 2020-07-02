@@ -17,7 +17,7 @@
             <div class="content">
                 <div>{{item['name']}} </div>
                 <div>{{item['artists'][0]['name']}}</div>   
-                <a class="ui button primary" href="{{url_for('add_song', uri=item['uri'])}}"">add</a>
+                <a class="ui button primary" href="{{url_for('add_song', uri=item['uri'], id=id)}}"">add</a>
          
             </div>
             

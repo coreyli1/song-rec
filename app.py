@@ -15,6 +15,7 @@ class User(db.Model):
     name = db.Column(db.String(80), nullable=False)
     uri = db.Column(db.String(120), unique=True, nullable=False)
     access_token=db.Column(db.String(120), nullable=False)
+
     tracks = db.relationship('Track', backref='user', lazy=True)
 
     def __repr__(self):
@@ -25,7 +26,10 @@ class Track(db.Model):
     song_name = db.Column(db.String(40), nullable=False)
     artist = db.Column(db.String(40), nullable=False)
     album_cover = db.Column(db.String(40), nullable=False)
+    # uri = db.Column(db.String(40), nullable = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+
 
     def __repr__(self):
         return f"Track( {self.song_name}, {self.artist} )"
@@ -132,18 +136,22 @@ def home():
 def profile(id):
     print(id)
     profile_data = session['profile_data']
+    user = User.query.filter_by(uri = id).first()
+    print(user.tracks)
+
     if (id == profile_data['uri']):
-        return render_template("profile.html", pd=profile_data)
+        return render_template("profile.html", pd=profile_data, tr=user.tracks)
     else:
         return redirect(url_for('rec', id=id))
 
 @app.route("/rec/<id>")
 def rec(id):
-    name = User.query.filter_by(uri = id).first().name
-    return render_template("rec.html", name=name)
+    user = User.query.filter_by(uri = id).first()
+    print(user.tracks)
+    return render_template("rec.html", name = user.name, id=id)
 
-@app.route("/results", methods=["GET", "POST"])
-def results():
+@app.route("/results/<id>", methods=["GET", "POST"])
+def results(id):
 
     if request.method == "POST":
         access_token = session['access_token']
@@ -153,15 +161,17 @@ def results():
         search_url = "https://api.spotify.com/v1/search?q=" + query
         search_response = requests.get(search_url, headers=auth_header)
         search_result = json.loads(search_response.text)
-    return render_template("results.html", sr=search_result)
 
-@app.route("/add_song/<uri>")
-def add_song(uri):
     
+    return render_template("results.html", sr=search_result, id=id)
+
+@app.route("/add_song/<uri>/<id>")
+def add_song(uri,id):
+    print(id)
+
     access_token = session['access_token']
     auth_header = {"Authorization": "Bearer {}".format(access_token)}
     track_url = "https://api.spotify.com/v1/tracks/" + uri[14:]
-    print(track_url)
     search_response = requests.get(track_url, headers=auth_header)
     search_result = json.loads(search_response.text)
     title = search_result['name']
@@ -170,7 +180,34 @@ def add_song(uri):
     print(title, artist, img_url)
 
 
-    # track = Track(song_name=title, )
-    return redirect(url_for('home'))
+
+
+    rec_user = User.query.filter_by(uri = id).first()
+    print(rec_user.id)
+
+    track = Track(song_name=title, artist=artist, album_cover=img_url, user_id=rec_user.id)
+
+    db.session.add(track)
+    db.session.commit()
+
+    print(rec_user.tracks)
+
+
+    return redirect(url_for('rec',id=id))
+
+@app.route("/like/<uri>/<id>")
+def like(uri,id):
+    print(id)
+    print(uri)
+
+    access_token = session['access_token']
+    auth_header = {"Authorization": "Bearer {}".format(access_token)}
+    like_url = "https://api.spotify.com/v1/me/tracks?ids=" + uri[14:]
+    
+
+
+    return redirect(url_for('profile', id=id))
+
+
 if __name__ == "__main__":
     app.run(debug=True) 

@@ -9,7 +9,7 @@
 <body>
     <div class="ui padded centered grid">
         <div class="row">Recommend {{name}} a song</div>
-        <form method="POST" action="{{url_for('results')}}">
+        <form method="POST" action="{{url_for('results',id=id)}}">
             <input type='text' name='recommendation' value='Recommend a song'>
             <button type='submit'>Search</button>
         </form>

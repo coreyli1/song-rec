@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from urllib.parse import quote
 import requests
 import json
+import os
 
 app = Flask(__name__)
 app.secret_key = 'hello'
@@ -43,7 +44,7 @@ SPOTIFY_API_URL = "{}/{}".format(SPOTIFY_API_BASE_URL, API_VERSION)
 # Server-side Parameters
 CLIENT_SIDE_URL = "http://127.0.0.1"
 PORT = 5000
-REDIRECT_URI = "{}:{}/callback/q".format(CLIENT_SIDE_URL, PORT)
+REDIRECT_URI = os.environ.get('REDIRECT_URI')
 SCOPE = "playlist-modify-public playlist-modify-private user-modify-playback-state user-read-playback-state user-read-currently-playing user-library-modify"
 STATE = ""
 SHOW_DIALOG_bool = True
@@ -218,7 +219,7 @@ def like(uri,id):
     print(track)
     db.session.delete(track)
     db.session.commit()
-
+    
     print("Song is added")
 
 
@@ -226,4 +227,4 @@ def like(uri,id):
 
 
 if __name__ == "__main__":
-    app.run() 
+    app.run(debug=True) 

@@ -15,7 +15,7 @@
             </div>
 
             <div class="content">
-                <div>{{item['name']}} </div>
+                <div style="font-size: 1.5em;">{{item['name']}} </div>
                 <div>{{item['artists'][0]['name']}}</div>   
                 <a class="ui button primary" href="{{url_for('add_song', uri=item['uri'], id=id)}}"">add</a>
          

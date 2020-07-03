@@ -8,10 +8,15 @@
 </head>
 <body>
     <div class="ui padded centered grid">
-        <div class="row">Recommend {{name}} a song</div>
+        <div class="row"></div>
+        <div class="row"></div>
+        <h3 class="row">Recommend {{name}} a song</h3>
         <form method="POST" action="{{url_for('results',id=id)}}">
-            <input type='text' name='recommendation' value='Recommend a song'>
-            <button type='submit'>Search</button>
+            <div class="ui input">
+                <input  type='text' name='recommendation'>
+            </div>
+            
+            <button class="ui button"type='submit'>Search</button>
         </form>
 
     </div>

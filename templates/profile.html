@@ -30,12 +30,12 @@
             {%for track in tr %}
             <div class="card">
                 <div class="ui image">
-                    <img src="{{track.album_cover}}" />                
+                    <img src="{{track.img_url}}" />                
                 </div>
                 <div class="content">
-                    <p>{{track.song_name}}</p>
+                    <p>{{track.title}}</p>
                     <p>{{track.artist}}</p>
-                    <a class="ui button primary">add</a>
+                    <a class="ui button primary" href="{{url_for('like', id=pd['uri'], uri=track.uri)}}">add</a>
                 </div>
             </div>
                 

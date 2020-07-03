@@ -23,16 +23,14 @@ class User(db.Model):
 
 class Track(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    song_name = db.Column(db.String(40), nullable=False)
+    title = db.Column(db.String(40), nullable=False)
     artist = db.Column(db.String(40), nullable=False)
-    album_cover = db.Column(db.String(40), nullable=False)
-    # uri = db.Column(db.String(40), nullable = False)
+    img_url = db.Column(db.String(40), nullable=False)
+    uri = db.Column(db.String(40), nullable = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-
-
     def __repr__(self):
-        return f"Track( {self.song_name}, {self.artist} )"
+        return f"Track( {self.title}, {self.artist}, {self.uri} )"
 
 
 # Spotify URLS
@@ -46,7 +44,7 @@ SPOTIFY_API_URL = "{}/{}".format(SPOTIFY_API_BASE_URL, API_VERSION)
 CLIENT_SIDE_URL = "http://127.0.0.1"
 PORT = 5000
 REDIRECT_URI = "{}:{}/callback/q".format(CLIENT_SIDE_URL, PORT)
-SCOPE = "playlist-modify-public playlist-modify-private user-modify-playback-state user-read-playback-state user-read-currently-playing"
+SCOPE = "playlist-modify-public playlist-modify-private user-modify-playback-state user-read-playback-state user-read-currently-playing user-library-modify"
 STATE = ""
 SHOW_DIALOG_bool = True
 SHOW_DIALOG_str = str(SHOW_DIALOG_bool).lower()
@@ -115,6 +113,7 @@ def callback():
     name = profile_data['display_name']
     uri = profile_data['uri']
     a_t = access_token
+
     user = User(name=name, uri=uri, access_token=a_t)
 
     if User.query.filter_by(name = name).first() != None and User.query.filter_by(name = name).first().name == name:
@@ -137,18 +136,24 @@ def profile(id):
     print(id)
     profile_data = session['profile_data']
     user = User.query.filter_by(uri = id).first()
-    print(user.tracks)
+    tracks = []
+    if user != None:
+        tracks = user.tracks
 
     if (id == profile_data['uri']):
-        return render_template("profile.html", pd=profile_data, tr=user.tracks)
+        return render_template("profile.html", pd=profile_data, tr=tracks)
     else:
         return redirect(url_for('rec', id=id))
 
 @app.route("/rec/<id>")
 def rec(id):
     user = User.query.filter_by(uri = id).first()
-    print(user.tracks)
-    return render_template("rec.html", name = user.name, id=id)
+    print(user)
+    if user != None:
+        return render_template("rec.html", name = user.name, id=id)
+    
+    else:
+        return render_template("error.html")
 
 @app.route("/results/<id>", methods=["GET", "POST"])
 def results(id):
@@ -174,10 +179,13 @@ def add_song(uri,id):
     track_url = "https://api.spotify.com/v1/tracks/" + uri[14:]
     search_response = requests.get(track_url, headers=auth_header)
     search_result = json.loads(search_response.text)
+
     title = search_result['name']
     artist = search_result['artists'][0]['name']
     img_url = search_result['album']['images'][1]['url']
-    print(title, artist, img_url)
+    uri = uri[14:]
+
+    print(title, artist, img_url, uri)
 
 
 
@@ -185,7 +193,7 @@ def add_song(uri,id):
     rec_user = User.query.filter_by(uri = id).first()
     print(rec_user.id)
 
-    track = Track(song_name=title, artist=artist, album_cover=img_url, user_id=rec_user.id)
+    track = Track(title=title, artist=artist, img_url=img_url, uri=uri, user_id=rec_user.id)
 
     db.session.add(track)
     db.session.commit()
@@ -202,8 +210,16 @@ def like(uri,id):
 
     access_token = session['access_token']
     auth_header = {"Authorization": "Bearer {}".format(access_token)}
-    like_url = "https://api.spotify.com/v1/me/tracks?ids=" + uri[14:]
+    like_url = "https://api.spotify.com/v1/me/tracks?ids=" + uri
+    put_like = requests.put(like_url, headers=auth_header)
+    print(put_like.text)
+
+    track = Track.query.filter_by(uri=uri).first()
+    print(track)
+    db.session.delete(track)
+    db.session.commit()
     
+    print("Song is added")
 
 
     return redirect(url_for('profile', id=id))

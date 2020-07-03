@@ -218,7 +218,7 @@ def like(uri,id):
     print(track)
     db.session.delete(track)
     db.session.commit()
-    
+
     print("Song is added")
 
 
@@ -226,4 +226,4 @@ def like(uri,id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True) 
+    app.run() 

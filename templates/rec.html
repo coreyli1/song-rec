@@ -9,8 +9,11 @@
 <body>
     <div class="ui padded centered grid">
         <div class="row"></div>
-        <div class="row"></div>
         <h3 class="row">Recommend {{name}} a song</h3>
+        <div class="row">
+            <img class="ui small image" src="{{img_url}}" />
+        </div>
+
         <form method="POST" action="{{url_for('results',id=id)}}">
             <div class="ui input">
                 <input  type='text' name='recommendation'>

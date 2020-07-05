@@ -15,6 +15,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     uri = db.Column(db.String(120), unique=True, nullable=False)
+    img_url = db.Column(db.String(40), nullable=False)
     access_token=db.Column(db.String(120), nullable=False)
 
     tracks = db.relationship('Track', backref='user', lazy=True)
@@ -113,9 +114,14 @@ def callback():
 
     name = profile_data['display_name']
     uri = profile_data['uri']
+    if len(profile_data['images']) < 1:
+        img_url = "profpic.jfif"
+    else:
+        img_url = profile_data['images'][0]['url']
     a_t = access_token
 
-    user = User(name=name, uri=uri, access_token=a_t)
+
+    user = User(name=name, uri=uri, access_token=a_t, img_url = img_url)
 
     if User.query.filter_by(name = name).first() != None and User.query.filter_by(name = name).first().name == name:
         print('User is already created')
@@ -149,15 +155,16 @@ def profile(id):
 @app.route("/rec/<id>")
 def rec(id):
     user = User.query.filter_by(uri = id).first()
-    print(user)
+    print(user.img_url)
     if user != None:
-        return render_template("rec.html", name = user.name, id=id)
+        return render_template("rec.html", name = user.name, id=id, img_url= user.img_url)
     
     else:
         return render_template("error.html")
 
 @app.route("/results/<id>", methods=["GET", "POST"])
 def results(id):
+    user = User.query.filter_by(uri = id).first()
 
     if request.method == "POST":
         access_token = session['access_token']
@@ -169,7 +176,7 @@ def results(id):
         search_result = json.loads(search_response.text)
 
     
-    return render_template("results.html", sr=search_result, id=id)
+    return render_template("results.html", sr=search_result, id=id, name = user.name)
 
 @app.route("/add_song/<uri>/<id>")
 def add_song(uri,id):
@@ -185,10 +192,6 @@ def add_song(uri,id):
     artist = search_result['artists'][0]['name']
     img_url = search_result['album']['images'][1]['url']
     uri = uri[14:]
-
-    print(title, artist, img_url, uri)
-
-
 
 
     rec_user = User.query.filter_by(uri = id).first()

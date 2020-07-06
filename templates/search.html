@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../static/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet"> 
+    <title>Search</title>
+</head>
+<body>
+    <div class='container'>
+
+        <img class="logo-image" src="../static/songrec.svg"/>
+
+        <form method="POST" action="{{url_for('results',id=id)}}">
+            <div class="ui input">
+                <input  type='text' name='recommendation'>
+            </div>
+            
+            <button class="button" type='submit'>Search</button>
+        </form>
+                    
+
+
+    </div>
+
+</body>
+</html>

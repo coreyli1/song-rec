@@ -3,26 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet"> 
     <title>Document</title>
 </head>
 <body>
-    <div class="ui padded grid centered">
+    <div class="container">
 
-        <h3 class="row" >Hi {{pd.display_name}}</h3>
-        <h3 class="row">Here are your recommendations</h3>
-        <div class="ui grid centered items">
+        <h2>Hi {{pd.display_name}}</h2>
+        <h4>Here are your recommendations</h4>
+
             {%for track in tr %}
-            <div class="item">
+            <div class="card">
 
-                <img class="ui small image" src="{{track.img_url}}" />                
+                <img class="album-img" src="{{track.img_url}}" />                
 
-                <div class="content">
-                    <p class="header">{{track.title}}</p>
-                    <p class="meta">{{track.artist}}</p>
+                <div class="song-description">
+                    <h4>{{track.title}}</h4>
+                    <h6>{{track.artist}}</h6>
                     
                 </div>
-                <a class="ui button primary" href="{{url_for('like', id=pd['uri'], uri=track.uri)}}">add</a>
+                <a class="add" href="{{url_for('like', id=pd['uri'], uri=track.uri)}}">+</a>
             </div>    
 
             
@@ -31,7 +32,7 @@
                 
 
             {%endfor%}        
-        </div>
+
 
     </div>
 

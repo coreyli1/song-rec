@@ -3,22 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
-    <title>Song Rec Home</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet">   
+    <title>Home</title>
 </head>
 <body>
-    <div class='ui padded centered grid'>
-        <div class='row '>
-            <img class="medium image ui " src="../static/songrec.svg"/>
-        </div>
-        <div class='row'>   
-            <a class='ui button' href='{{url_for('profile', id=pd['uri'])}}'>Profile</a>
-        </div>
-        <div class='row'>
-            <a class='ui button' href='#'>Search</a>    
-        </div>
-                    
+    <div class='container'>
+        <img class="logo-image" src="../static/songrec.svg"/>
 
+        <a class='button' href='{{url_for('profile', id=pd['uri'])}}'>Profile</a>
+        <a class='button' href='{{url_for('search')}}'>Search</a>                
 
     </div>
 

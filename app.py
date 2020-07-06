@@ -115,7 +115,7 @@ def callback():
     name = profile_data['display_name']
     uri = profile_data['uri']
     if len(profile_data['images']) < 1:
-        img_url = "profpic.jfif"
+        img_url = "../static/profpic.jfif"
     else:
         img_url = profile_data['images'][0]['url']
     a_t = access_token
@@ -137,6 +137,10 @@ def callback():
 def home():
     profile_data = session['profile_data']
     return render_template("home.html", pd=profile_data)
+
+@app.route("/search")
+def search():
+    return render_template("search.html")
 
 @app.route("/profile/<id>")
 def profile(id):
@@ -190,7 +194,7 @@ def add_song(uri,id):
 
     title = search_result['name']
     artist = search_result['artists'][0]['name']
-    img_url = search_result['album']['images'][1]['url']
+    img_url = search_result['album']['images'][2]['url']
     uri = uri[14:]
 
 

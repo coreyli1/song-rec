@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap" rel="stylesheet">   
     <title>Recommendations</title>
 </head>
 <body>
-    <div class="ui padded centered grid">
-        <div class="row"></div>
+    <div class="container">
         <h3 class="row">Recommend {{name}} a song</h3>
         <div class="row">
-            <img class="ui small image" src="{{img_url}}" />
+            <img class="image" src="{{img_url}}" />
         </div>
 
         <form method="POST" action="{{url_for('results',id=id)}}">
-            <div class="ui input">
-                <input  type='text' name='recommendation'>
-            </div>
+            <input class="input"  type='text' name='recommendation'>
+
             
-            <button class="ui button"type='submit'>Search</button>
+            <button class="submit"type='submit'>Search</button>
         </form>
 
     </div>

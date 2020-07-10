@@ -131,7 +131,10 @@ def callback():
         print(f'{name} is added to the database')
     
     # redirecting to the home page
-    return redirect('/home')
+    if 'user_id' in session:
+        return redirect(url_for('profile',id=session['user_id']))
+    else:
+        return redirect('/home')
 
 @app.route("/home")
 def home():
@@ -145,7 +148,15 @@ def search():
 @app.route("/profile/<id>")
 def profile(id):
     print(id)
-    profile_data = session['profile_data']
+    
+    if 'profile_data' in session:
+        profile_data = session['profile_data']
+    else:
+        session['user_id'] = id
+        url_args = "&".join(["{}={}".format(key, quote(val)) for key, val in auth_query_parameters.items()])
+        auth_url = "{}/?{}".format(SPOTIFY_AUTH_URL, url_args)
+        return redirect(auth_url)
+    
     user = User.query.filter_by(uri = id).first()
     tracks = []
     if user != None:
